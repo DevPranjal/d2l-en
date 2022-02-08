@@ -187,9 +187,9 @@ from tensorflow_probability import distributions as tfd
 #@tab jax
 %matplotlib inline
 from d2l import jax as d2l
-import jax.numpy as np
+import jax.numpy as jnp
 import jax
-import numpy as onp
+import numpy as np
 import random
 ```
 
@@ -256,7 +256,7 @@ tfd.Multinomial(100, fair_probs).sample()
 ```{.python .input}
 #@tab jax
 fair_probs = [1.0 / 6] * 6
-onp.random.multinomial(1, fair_probs)
+np.random.multinomial(1, fair_probs) # jax.random does have multinomial distribution implemented
 ```
 
 Each time you run this sampling process,
@@ -286,7 +286,7 @@ tfd.Multinomial(100, fair_probs).sample() / 100
 
 ```{.python .input}
 #@tab jax
-onp.random.multinomial(10, fair_probs)
+np.random.multinomial(10, fair_probs)
 ```
 
 Here, even though our simulated coin is fair 
@@ -319,7 +319,7 @@ counts / 10000
 
 ```{.python .input}
 #@tab jax
-counts = onp.random.multinomial(1000, fair_probs).astype(np.float32)
+counts = np.random.multinomial(1000, fair_probs).astype(np.float32)
 counts / 1000
 ```
 
@@ -386,8 +386,8 @@ d2l.plt.legend();
 
 ```{.python .input}
 #@tab jax
-counts = onp.random.multinomial(10, fair_probs, size=500)
-cum_counts = counts.astype(onp.float32).cumsum(axis=0)
+counts = np.random.multinomial(10, fair_probs, size=500)
+cum_counts = counts.astype(np.float32).cumsum(axis=0)
 estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
 
 d2l.set_figsize((6, 4.5))

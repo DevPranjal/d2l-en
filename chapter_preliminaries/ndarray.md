@@ -72,6 +72,12 @@ import torch
 import tensorflow as tf
 ```
 
+```{.python .input}
+#@tab jax
+import jax
+import jax.numpy as jnp
+```
+
 [**A tensor represents a (possibly multi-dimensional) array of numerical values.**]
 With one axis, a tensor is called a *vector*.
 With two axes, a tensor is called a *matrix*.
@@ -137,6 +143,12 @@ x = tf.range(12, dtype=tf.float32)
 x
 ```
 
+```{.python .input}
+#@tab jax
+x = jnp.arange(12)
+x
+```
+
 :begin_tab:`mxnet`
 Each of these values is called
 an *element* of the tensor.
@@ -175,6 +187,11 @@ x.numel()
 tf.size(x)
 ```
 
+```{.python .input}
+#@tab jax
+x.size
+```
+
 (**We can access a tensor's *shape***) 
 (the length along each axis)
 by inspecting its `shape` attribute.
@@ -200,7 +217,7 @@ are laid out one row at a time and thus
 `x[3] == X[0, 3]`.
 
 ```{.python .input}
-#@tab mxnet, pytorch
+#@tab mxnet, pytorch, jax
 X = x.reshape(3, 4)
 X
 ```
@@ -243,6 +260,11 @@ torch.zeros((2, 3, 4))
 tf.zeros((2, 3, 4))
 ```
 
+```{.python .input}
+#@tab jax
+jnp.zeros((2, 3, 4))
+```
+
 Similarly, we can create a tensor 
 with all ones by invoking `ones`.
 
@@ -258,6 +280,11 @@ torch.ones((2, 3, 4))
 ```{.python .input}
 #@tab tensorflow
 tf.ones((2, 3, 4))
+```
+
+```{.python .input}
+#@tab jax
+jnp.ones((2, 3, 4))
 ```
 
 We often wish to 
@@ -284,6 +311,13 @@ torch.randn(3, 4)
 tf.random.normal(shape=[3, 4])
 ```
 
+```{.python .input}
+#@tab jax
+# any call of a random function in JAX requires a key to be specified
+# feeding the same key to a random function will always result in the same sample being generated
+jax.random.normal(jax.random.PRNGKey(0), (3, 4))
+```
+
 Finally, we can construct tensors by
 [**supplying the exact values for each element**] 
 by supplying (possibly nested) Python list(s) 
@@ -304,6 +338,10 @@ torch.tensor([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 ```{.python .input}
 #@tab tensorflow
 tf.constant([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
+```
+
+```{.python .input}
+jnp.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 ```
 
 ## Indexing and Slicing
@@ -357,6 +395,14 @@ X_var[1, 2].assign(9)
 X_var
 ```
 
+```{.python .input}
+# JAX arrays are immutable
+# `jax.numpy.ndarray.at` index update operators create
+# a new array with the corresponding modifications made
+X_new_1 = X.at[1, 2].set(17)
+X_new_1
+```
+
 If we want [**to assign multiple elements the same value,
 we apply the indexing on the left-hand side 
 of the assignment operation.**]
@@ -378,6 +424,11 @@ X
 X_var = tf.Variable(X)
 X_var[:2, :].assign(tf.ones(X_var[:2,:].shape, dtype=tf.float32) * 12)
 X_var
+```
+
+```{.python .input}
+X_new_2 = X_new_1.at[:2, :].set(12)
+X_new_2
 ```
 
 ## Operations
@@ -418,6 +469,11 @@ torch.exp(x)
 ```{.python .input}
 #@tab tensorflow
 tf.exp(x)
+```
+
+```{.python .input}
+#@tab jax
+jnp.exp(x)
 ```
 
 Likewise, we denote *binary* scalar operators,
@@ -463,6 +519,13 @@ y = tf.constant([2.0, 2, 2, 2])
 x + y, x - y, x * y, x / y, x ** y
 ```
 
+```{.python .input}
+#@tab jax
+x = jnp.array([1.0, 2, 4, 8])
+y = jnp.array([2, 2, 2, 2])
+x + y, x - y, x * y, x / y, x ** y
+```
+
 In addition to elementwise computations,
 we can also perform linear algebra operations,
 such as dot products and matrix multiplications.
@@ -501,6 +564,13 @@ Y = tf.constant([[2.0, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 tf.concat([X, Y], axis=0), tf.concat([X, Y], axis=1)
 ```
 
+```{.python .input}
+#@tab jax
+X = jnp.arange(12, dtype=jnp.float32).reshape((3, 4))
+Y = jnp.array([[2.0, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
+jnp.concatenate((X, Y), axis=0), jnp.concatenate((X, Y), axis=1)
+```
+
 Sometimes, we want to 
 [**construct a binary tensor via *logical statements*.**]
 Take `X == Y` as an example.
@@ -516,7 +586,7 @@ X == Y
 [**Summing all the elements in the tensor**] yields a tensor with only one element.
 
 ```{.python .input}
-#@tab mxnet, pytorch
+#@tab mxnet, pytorch, jax
 X.sum()
 ```
 
@@ -561,6 +631,13 @@ a, b
 #@tab tensorflow
 a = tf.reshape(tf.range(3), (3, 1))
 b = tf.reshape(tf.range(2), (1, 2))
+a, b
+```
+
+```{.python .input}
+#@tab jax
+a = jnp.arange(3).reshape((3, 1))
+b = jnp.arange(2).reshape((1, 2))
 a, b
 ```
 
@@ -659,6 +736,11 @@ Z.assign(X + Y)
 print('id(Z):', id(Z))
 ```
 
+```{.python .input}
+#@tab jax
+# JAX arrays do not allow in-place operations
+```
+
 :begin_tab:`mxnet, pytorch`
 [**If the value of `X` is not reused in subsequent computations,
 we can also use `X[:] = X + Y` or `X += Y`
@@ -743,6 +825,13 @@ B = tf.constant(A)
 type(A), type(B)
 ```
 
+```{.python .input}
+#@tab jax
+A = jax.device_get(X)
+B = jax.device_put(A)
+type(A), type(B)
+```
+
 To (**convert a size-1 tensor to a Python scalar**),
 we can invoke the `item` function or Python's built-in functions.
 
@@ -760,6 +849,12 @@ a, a.item(), float(a), int(a)
 ```{.python .input}
 #@tab tensorflow
 a = tf.constant([3.5]).numpy()
+a, a.item(), float(a), int(a)
+```
+
+```{.python .input}
+#@tab jax
+a = jnp.array([3.5])
 a, a.item(), float(a), int(a)
 ```
 
